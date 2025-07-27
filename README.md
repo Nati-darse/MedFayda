@@ -26,7 +26,7 @@ MedFayda solves this by:
 - **SMS fallback** for areas with poor internet.  
 
 ### Expected Outcome  
-- **30% faster diagnosis** with instant record access.  
+- **faster diagnosis** with instant record access.  
 - **Reduced duplicate tests**, saving costs.  
 - **Secure, nationwide scalability** via Fayda.  
 
