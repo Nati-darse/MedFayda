@@ -6,7 +6,9 @@
 ---
 
 ## Contributors  
-- Natnael Darsema  
+- Natnael Darsema
+- Kidus Paulos
+- Foziya Fetudin
 
 ---
 
