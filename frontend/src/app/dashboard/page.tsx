@@ -1,26 +1,6 @@
 'use client';
 
 import {
-  Box,
-  Container,
-  VStack,
-  HStack,
-  Heading,
-  Text,
-  Button,
-  Card,
-  CardBody,
-  CardHeader,
-  Icon,
-  Grid,
-  GridItem,
-  Badge,
-  Avatar,
-  useToast,
-  Flex,
-  Spacer,
-} from '@chakra-ui/react';
-import {
   FaUser,
   FaCalendarAlt,
   FaFileAlt,
@@ -43,7 +23,6 @@ interface User {
 
 export default function DashboardPage() {
   const router = useRouter();
-  const toast = useToast();
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -71,21 +50,15 @@ export default function DashboardPage() {
   const handleLogout = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
-    toast({
-      title: 'Logged Out',
-      description: 'You have been successfully logged out.',
-      status: 'success',
-      duration: 3000,
-      isClosable: true,
-    });
+    alert('Logged Out: You have been successfully logged out.');
     router.push('/');
   };
 
   if (isLoading) {
     return (
-      <Box minH="100vh" bg="gray.50" display="flex" alignItems="center" justifyContent="center">
-        <Text>Loading...</Text>
-      </Box>
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-lg">Loading...</div>
+      </div>
     );
   }
 
@@ -94,165 +67,147 @@ export default function DashboardPage() {
   }
 
   return (
-    <Box minH="100vh" bg="gray.50">
+    <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <Box bg="white" shadow="sm" borderBottom="1px" borderColor="gray.200">
-        <Container maxW="7xl" py={4}>
-          <Flex align="center">
-            <HStack spacing={3}>
-              <Icon as={FaHeartbeat} boxSize={8} color="cyan.500" />
-              <Heading size="lg" color="blue.700">
+      <div className="bg-white shadow-sm border-b border-gray-200">
+        <div className="max-w-7xl mx-auto py-4 px-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-3">
+              <FaHeartbeat className="w-8 h-8 text-cyan-500" />
+              <h1 className="text-2xl font-bold text-blue-700">
                 MedFayda
-              </Heading>
-            </HStack>
-            <Spacer />
-            <HStack spacing={4}>
-              <HStack spacing={2}>
-                <Avatar size="sm" name={`${user.firstName} ${user.lastName}`} />
-                <VStack spacing={0} align="start">
-                  <Text fontSize="sm" fontWeight="semibold">
+              </h1>
+            </div>
+            <div className="flex items-center space-x-4">
+              <div className="flex items-center space-x-2">
+                <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center text-white text-sm font-semibold">
+                  {user.firstName[0]}{user.lastName[0]}
+                </div>
+                <div className="flex flex-col">
+                  <div className="text-sm font-semibold">
                     {user.firstName} {user.lastName}
-                  </Text>
-                  <Text fontSize="xs" color="gray.500">
+                  </div>
+                  <div className="text-xs text-gray-500">
                     {user.role}
-                  </Text>
-                </VStack>
-              </HStack>
-              <Button
-                leftIcon={<Icon as={FaSignOutAlt} />}
-                variant="ghost"
-                size="sm"
+                  </div>
+                </div>
+              </div>
+              <button
+                className="flex items-center space-x-2 text-gray-600 hover:text-gray-800 transition-colors"
                 onClick={handleLogout}
               >
-                Logout
-              </Button>
-            </HStack>
-          </Flex>
-        </Container>
-      </Box>
+                <FaSignOutAlt className="w-4 h-4" />
+                <span>Logout</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
 
       {/* Main Content */}
-      <Container maxW="7xl" py={8}>
-        <VStack spacing={8} align="stretch">
+      <div className="max-w-7xl mx-auto py-8 px-4">
+        <div className="flex flex-col space-y-8">
           {/* Welcome Section */}
-          <Card>
-            <CardBody>
-              <VStack spacing={4} align="start">
-                <Heading size="lg">
-                  Welcome back, {user.firstName}!
-                </Heading>
-                <Text color="gray.600">
-                  Here's an overview of your health information and upcoming appointments.
-                </Text>
-                <HStack spacing={4}>
-                  <Badge colorScheme="green" px={3} py={1} borderRadius="full">
-                    Fayda ID: {user.faydaId}
-                  </Badge>
-                  <Badge colorScheme="blue" px={3} py={1} borderRadius="full">
-                    {user.role.charAt(0).toUpperCase() + user.role.slice(1)}
-                  </Badge>
-                </HStack>
-              </VStack>
-            </CardBody>
-          </Card>
+          <div className="bg-white rounded-lg shadow p-6">
+            <div className="flex flex-col space-y-4">
+              <h2 className="text-2xl font-bold">
+                Welcome back, {user.firstName}!
+              </h2>
+              <p className="text-gray-600">
+                Here&apos;s an overview of your health information and upcoming appointments.
+              </p>
+              <div className="flex space-x-4">
+                <span className="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm">
+                  Fayda ID: {user.faydaId}
+                </span>
+                <span className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm">
+                  {user.role.charAt(0).toUpperCase() + user.role.slice(1)}
+                </span>
+              </div>
+            </div>
+          </div>
 
           {/* Quick Actions */}
-          <Grid templateColumns={{ base: '1fr', md: 'repeat(2, 1fr)', lg: 'repeat(4, 1fr)' }} gap={6}>
-            <GridItem>
-              <Card h="full" cursor="pointer" _hover={{ shadow: 'md' }}>
-                <CardBody textAlign="center">
-                  <VStack spacing={3}>
-                    <Icon as={FaUser} boxSize={8} color="blue.500" />
-                    <Text fontWeight="semibold">My Profile</Text>
-                    <Text fontSize="sm" color="gray.600">
-                      View and update your personal information
-                    </Text>
-                  </VStack>
-                </CardBody>
-              </Card>
-            </GridItem>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="bg-white rounded-lg shadow p-6 cursor-pointer hover:shadow-md transition-shadow">
+              <div className="flex flex-col items-center space-y-3 text-center">
+                <FaUser className="w-8 h-8 text-blue-500" />
+                <h3 className="font-semibold">My Profile</h3>
+                <p className="text-sm text-gray-600">
+                  View and update your personal information
+                </p>
+              </div>
+            </div>
 
-            <GridItem>
-              <Card h="full" cursor="pointer" _hover={{ shadow: 'md' }}>
-                <CardBody textAlign="center">
-                  <VStack spacing={3}>
-                    <Icon as={FaFileAlt} boxSize={8} color="cyan.500" />
-                    <Text fontWeight="semibold">Health Records</Text>
-                    <Text fontSize="sm" color="gray.600">
-                      Access your complete medical history
-                    </Text>
-                  </VStack>
-                </CardBody>
-              </Card>
-            </GridItem>
+            <div className="bg-white rounded-lg shadow p-6 cursor-pointer hover:shadow-md transition-shadow">
+              <div className="flex flex-col items-center space-y-3 text-center">
+                <FaFileAlt className="w-8 h-8 text-cyan-500" />
+                <h3 className="font-semibold">Health Records</h3>
+                <p className="text-sm text-gray-600">
+                  Access your complete medical history
+                </p>
+              </div>
+            </div>
 
-            <GridItem>
-              <Card h="full" cursor="pointer" _hover={{ shadow: 'md' }}>
-                <CardBody textAlign="center">
-                  <VStack spacing={3}>
-                    <Icon as={FaCalendarAlt} boxSize={8} color="green.500" />
-                    <Text fontWeight="semibold">Appointments</Text>
-                    <Text fontSize="sm" color="gray.600">
-                      Schedule and manage appointments
-                    </Text>
-                  </VStack>
-                </CardBody>
-              </Card>
-            </GridItem>
+            <div className="bg-white rounded-lg shadow p-6 cursor-pointer hover:shadow-md transition-shadow">
+              <div className="flex flex-col items-center space-y-3 text-center">
+                <FaCalendarAlt className="w-8 h-8 text-green-500" />
+                <h3 className="font-semibold">Appointments</h3>
+                <p className="text-sm text-gray-600">
+                  Schedule and manage appointments
+                </p>
+              </div>
+            </div>
 
-            <GridItem>
-              <Card h="full" cursor="pointer" _hover={{ shadow: 'md' }}>
-                <CardBody textAlign="center">
-                  <VStack spacing={3}>
-                    <Icon as={FaBell} boxSize={8} color="orange.500" />
-                    <Text fontWeight="semibold">Reminders</Text>
-                    <Text fontSize="sm" color="gray.600">
-                      Medication and checkup reminders
-                    </Text>
-                  </VStack>
-                </CardBody>
-              </Card>
-            </GridItem>
-          </Grid>
+            <div className="bg-white rounded-lg shadow p-6 cursor-pointer hover:shadow-md transition-shadow">
+              <div className="flex flex-col items-center space-y-3 text-center">
+                <FaBell className="w-8 h-8 text-orange-500" />
+                <h3 className="font-semibold">Reminders</h3>
+                <p className="text-sm text-gray-600">
+                  Medication and checkup reminders
+                </p>
+              </div>
+            </div>
+          </div>
 
           {/* Recent Activity */}
-          <Grid templateColumns={{ base: '1fr', lg: '2fr 1fr' }} gap={6}>
-            <GridItem>
-              <Card>
-                <CardHeader>
-                  <Heading size="md">Recent Health Records</Heading>
-                </CardHeader>
-                <CardBody>
-                  <VStack spacing={4} align="stretch">
-                    <Text color="gray.500" textAlign="center" py={8}>
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div className="lg:col-span-2">
+              <div className="bg-white rounded-lg shadow">
+                <div className="px-6 py-4 border-b border-gray-200">
+                  <h3 className="text-lg font-semibold">Recent Health Records</h3>
+                </div>
+                <div className="p-6">
+                  <div className="text-center py-8">
+                    <p className="text-gray-500">
                       No recent health records found.
                       <br />
                       Your medical visits will appear here.
-                    </Text>
-                  </VStack>
-                </CardBody>
-              </Card>
-            </GridItem>
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
 
-            <GridItem>
-              <Card>
-                <CardHeader>
-                  <Heading size="md">Upcoming Appointments</Heading>
-                </CardHeader>
-                <CardBody>
-                  <VStack spacing={4} align="stretch">
-                    <Text color="gray.500" textAlign="center" py={8}>
+            <div className="lg:col-span-1">
+              <div className="bg-white rounded-lg shadow">
+                <div className="px-6 py-4 border-b border-gray-200">
+                  <h3 className="text-lg font-semibold">Upcoming Appointments</h3>
+                </div>
+                <div className="p-6">
+                  <div className="text-center py-8">
+                    <p className="text-gray-500">
                       No upcoming appointments.
                       <br />
                       Schedule your next visit.
-                    </Text>
-                  </VStack>
-                </CardBody>
-              </Card>
-            </GridItem>
-          </Grid>
-        </VStack>
-      </Container>
-    </Box>
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 }

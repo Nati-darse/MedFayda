@@ -1,16 +1,5 @@
 'use client';
 
-import {
-  Box,
-  Container,
-  VStack,
-  Heading,
-  Text,
-  Spinner,
-  Alert,
-  AlertIcon,
-  Button,
-} from '@chakra-ui/react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
@@ -73,61 +62,66 @@ export default function AuthCallbackPage() {
   }, [searchParams, router]);
 
   return (
-    <Box minH="100vh" bg="gray.50" display="flex" alignItems="center" justifyContent="center">
-      <Container maxW="md">
-        <VStack spacing={6} textAlign="center">
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="max-w-md mx-auto px-4">
+        <div className="flex flex-col items-center space-y-6 text-center">
           {status === 'loading' && (
             <>
-              <Spinner size="xl" color="blue.500" thickness="4px" />
-              <Heading size="lg" color="blue.700">
+              <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-500"></div>
+              <h1 className="text-2xl font-bold text-blue-700">
                 Completing Authentication
-              </Heading>
-              <Text color="gray.600">
+              </h1>
+              <p className="text-gray-600">
                 Please wait while we verify your Fayda ID credentials...
-              </Text>
+              </p>
             </>
           )}
 
           {status === 'success' && (
             <>
-              <Box fontSize="4xl">✅</Box>
-              <Heading size="lg" color="success.600">
+              <div className="text-6xl">✅</div>
+              <h1 className="text-2xl font-bold text-green-600">
                 Authentication Successful!
-              </Heading>
-              <Text color="gray.600">
+              </h1>
+              <p className="text-gray-600">
                 Welcome to MedFayda! You will be redirected to your dashboard shortly.
-              </Text>
+              </p>
             </>
           )}
 
           {status === 'error' && (
             <>
-              <Alert status="error" borderRadius="md">
-                <AlertIcon />
-                <VStack align="start" spacing={2}>
-                  <Text fontWeight="semibold">Authentication Failed</Text>
-                  <Text fontSize="sm">{error}</Text>
-                </VStack>
-              </Alert>
-              <VStack spacing={3}>
-                <Button
-                  colorScheme="blue"
+              <div className="bg-red-50 border border-red-200 rounded-md p-4 w-full">
+                <div className="flex">
+                  <div className="flex-shrink-0">
+                    <div className="text-red-400">⚠️</div>
+                  </div>
+                  <div className="ml-3">
+                    <div className="text-sm">
+                      <p className="font-semibold text-red-800">Authentication Failed</p>
+                      <p className="text-red-700 mt-1">{error}</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div className="flex flex-col space-y-3">
+                <button
+                  className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
                   onClick={() => router.push('/auth/login')}
                 >
                   Try Again
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="sm"
+                </button>
+                <button
+                  className="px-4 py-2 text-gray-600 hover:text-gray-800 transition-colors"
                   onClick={() => router.push('/')}
                 >
                   Back to Home
-                </Button>
-              </VStack>
+                </button>
+              </div>
             </>
           )}
-        </VStack>
-      </Container>
-    </Box>
+        </div>
+      </div>
+    </div>
   );
 }

@@ -1,6 +1,5 @@
 'use client';
 
-import { Box, Container, Heading, Text, VStack, Button, HStack, Icon } from '@chakra-ui/react';
 import { FaHeartbeat, FaUserMd, FaCalendarAlt, FaShieldAlt } from 'react-icons/fa';
 import { useRouter } from 'next/navigation';
 
@@ -8,78 +7,73 @@ export default function Home() {
   const router = useRouter();
 
   return (
-    <Box minH="100vh" bg="gray.50">
-      <Container maxW="7xl" py={20}>
-        <VStack spacing={12} textAlign="center">
+    <div className="min-h-screen bg-gray-50">
+      <div className="max-w-7xl mx-auto py-20 px-4">
+        <div className="flex flex-col items-center space-y-12 text-center">
           {/* Hero Section */}
-          <VStack spacing={6}>
-            <HStack spacing={3}>
-              <Icon as={FaHeartbeat} boxSize={12} color="blue.500" />
-              <Heading size="2xl" color="blue.700">
+          <div className="flex flex-col items-center space-y-6">
+            <div className="flex items-center space-x-3">
+              <FaHeartbeat className="w-12 h-12 text-blue-500" />
+              <h1 className="text-4xl font-bold text-blue-700">
                 MedFayda
-              </Heading>
-            </HStack>
-            <Heading size="lg" color="gray.600" maxW="2xl">
+              </h1>
+            </div>
+            <h2 className="text-2xl text-gray-600 max-w-2xl">
               Secure Health Record Access System for Ethiopia
-            </Heading>
-            <Text fontSize="xl" color="gray.500" maxW="3xl">
+            </h2>
+            <p className="text-xl text-gray-500 max-w-3xl">
               Unified health records linked to Fayda IDs with real-time access for doctors
               and secure, nationwide scalability.
-            </Text>
-          </VStack>
+            </p>
+          </div>
 
           {/* Features */}
-          <HStack spacing={8} flexWrap="wrap" justify="center">
-            <VStack spacing={3} p={6} bg="white" rounded="lg" shadow="md" minW="200px">
-              <Icon as={FaShieldAlt} boxSize={8} color="blue.500" />
-              <Text fontWeight="bold">Fayda ID Integration</Text>
-              <Text fontSize="sm" color="gray.600" textAlign="center">
+          <div className="flex flex-wrap justify-center gap-8">
+            <div className="flex flex-col items-center space-y-3 p-6 bg-white rounded-lg shadow-md min-w-[200px]">
+              <FaShieldAlt className="w-8 h-8 text-blue-500" />
+              <h3 className="font-bold">Fayda ID Integration</h3>
+              <p className="text-sm text-gray-600 text-center">
                 Government-backed identity verification
-              </Text>
-            </VStack>
-            <VStack spacing={3} p={6} bg="white" rounded="lg" shadow="md" minW="200px">
-              <Icon as={FaUserMd} boxSize={8} color="cyan.500" />
-              <Text fontWeight="bold">Unified Records</Text>
-              <Text fontSize="sm" color="gray.600" textAlign="center">
+              </p>
+            </div>
+            <div className="flex flex-col items-center space-y-3 p-6 bg-white rounded-lg shadow-md min-w-[200px]">
+              <FaUserMd className="w-8 h-8 text-cyan-500" />
+              <h3 className="font-bold">Unified Records</h3>
+              <p className="text-sm text-gray-600 text-center">
                 Complete medical history in one place
-              </Text>
-            </VStack>
-            <VStack spacing={3} p={6} bg="white" rounded="lg" shadow="md" minW="200px">
-              <Icon as={FaCalendarAlt} boxSize={8} color="green.500" />
-              <Text fontWeight="bold">Smart Reminders</Text>
-              <Text fontSize="sm" color="gray.600" textAlign="center">
+              </p>
+            </div>
+            <div className="flex flex-col items-center space-y-3 p-6 bg-white rounded-lg shadow-md min-w-[200px]">
+              <FaCalendarAlt className="w-8 h-8 text-green-500" />
+              <h3 className="font-bold">Smart Reminders</h3>
+              <p className="text-sm text-gray-600 text-center">
                 Never miss appointments or medications
-              </Text>
-            </VStack>
-          </HStack>
+              </p>
+            </div>
+          </div>
 
           {/* CTA Buttons */}
-          <HStack spacing={4} flexWrap="wrap" justify="center">
-            <Button
-              size="lg"
-              colorScheme="blue"
+          <div className="flex flex-wrap justify-center gap-4">
+            <button
+              className="px-8 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
               onClick={() => router.push('/auth/login')}
-              px={8}
             >
               Login with Fayda ID
-            </Button>
-            <Button
-              size="lg"
-              variant="outline"
-              colorScheme="blue"
+            </button>
+            <button
+              className="px-8 py-3 border-2 border-blue-500 text-blue-500 rounded-lg hover:bg-blue-50 transition-colors"
               onClick={() => router.push('/auth/sms-login')}
-              px={8}
             >
               SMS Login
-            </Button>
-          </HStack>
+            </button>
+          </div>
 
           {/* Footer */}
-          <Text fontSize="sm" color="gray.500" mt={12}>
-            Built for Ethiopia's healthcare system with security and accessibility in mind
-          </Text>
-        </VStack>
-      </Container>
-    </Box>
+          <p className="text-sm text-gray-500 mt-12">
+            Built for Ethiopia&apos;s healthcare system with security and accessibility in mind
+          </p>
+        </div>
+      </div>
+    </div>
   );
 }
