@@ -1,5 +1,8 @@
 const jwt = require('jsonwebtoken');
-const { User } = require('../models');
+// const { User } = require('../models'); // Disabled for now
+
+// In-memory storage for development
+const { users } = require('../storage/memory');
 
 // Verify JWT token
 const authenticateToken = async (req, res, next) => {
@@ -15,13 +18,13 @@ const authenticateToken = async (req, res, next) => {
     }
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    
-    // Get user from database
-    const user = await User.findByPk(decoded.userId);
-    if (!user || !user.isActive) {
+
+    // Get user from memory (for testing)
+    const user = users.get(decoded.userId);
+    if (!user) {
       return res.status(401).json({
         error: 'Access Denied',
-        message: 'Invalid token or user not active'
+        message: 'Invalid token or user not found'
       });
     }
 
@@ -76,10 +79,8 @@ const canAccessPatient = async (req, res, next) => {
 
     // Patients can only access their own data
     if (user.role === 'patient') {
-      const { Patient } = require('../models');
-      const patient = await Patient.findOne({ where: { userId: user.id } });
-      
-      if (!patient || patient.id !== patientId) {
+      // For testing - simplified patient access check
+      if (user.id !== patientId) {
         return res.status(403).json({
           error: 'Forbidden',
           message: 'You can only access your own medical records'

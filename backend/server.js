@@ -6,7 +6,7 @@ const rateLimit = require('express-rate-limit');
 const session = require('express-session');
 require('dotenv').config();
 
-const { sequelize } = require('./models');
+// const { sequelize } = require('./models'); // Disabled for testing
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -58,11 +58,12 @@ app.get('/health', (req, res) => {
 
 // API routes
 app.use('/api/auth', require('./routes/auth'));
-app.use('/api/users', require('./routes/users'));
-app.use('/api/patients', require('./routes/patients'));
-app.use('/api/health-records', require('./routes/healthRecords'));
-app.use('/api/appointments', require('./routes/appointments'));
-app.use('/api/reminders', require('./routes/reminders'));
+// Temporarily disabled routes that require database
+// app.use('/api/users', require('./routes/users'));
+// app.use('/api/patients', require('./routes/patients'));
+// app.use('/api/health-records', require('./routes/healthRecords'));
+// app.use('/api/appointments', require('./routes/appointments'));
+// app.use('/api/reminders', require('./routes/reminders'));
 
 // Error handling middleware
 app.use((err, req, res, next) => {
@@ -99,18 +100,13 @@ app.use('*', (req, res) => {
 // Database connection and server startup
 async function startServer() {
   try {
-    await sequelize.authenticate();
-    console.log('Database connection established successfully.');
-    
-    // Sync database (create tables if they don't exist)
-    if (process.env.NODE_ENV === 'development') {
-      await sequelize.sync({ alter: true });
-      console.log('Database synchronized successfully.');
-    }
-    
+    // Skip database connection for now - use in-memory storage
+    console.log('Starting server without database (development mode)');
+
     app.listen(PORT, () => {
       console.log(`Server is running on port ${PORT}`);
       console.log(`Environment: ${process.env.NODE_ENV}`);
+      console.log('Note: Running without database - using in-memory storage');
     });
   } catch (error) {
     console.error('Unable to start server:', error);

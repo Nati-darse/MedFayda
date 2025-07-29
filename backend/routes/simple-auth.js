@@ -1,32 +1,28 @@
 const express = require('express');
 const jwt = require('jsonwebtoken');
 const { body, validationResult } = require('express-validator');
-// const { User, Patient } = require('../models'); // Disabled for now
-const { authenticateToken } = require('../middleware/auth');
-// const faydaOIDCService = require('../services/faydaOIDC'); // Disabled for now
-
-// In-memory storage for development
-const { users, sessions } = require('../storage/memory');
 
 const router = express.Router();
+
+// In-memory storage for testing
+const users = new Map();
+const sessions = new Map();
 
 // Generate JWT token
 const generateToken = (userId) => {
   return jwt.sign(
     { userId },
-    process.env.JWT_SECRET,
+    process.env.JWT_SECRET || 'test-secret',
     { expiresIn: process.env.JWT_EXPIRES_IN || '24h' }
   );
 };
 
-// Start Fayda ID OIDC authentication (simplified for testing)
+// Start Fayda ID authentication (simplified for testing)
 router.get('/fayda-auth', (req, res) => {
   try {
-    // For development/testing - simulate OIDC flow
     const state = 'test-state-' + Date.now();
     const authUrl = `http://localhost:3000/auth/callback?code=test-code&state=${state}`;
-
-    // Store state in session
+    
     req.session = req.session || {};
     req.session.state = state;
 
@@ -59,7 +55,7 @@ router.post('/fayda-callback', [
     }
 
     const { code, state } = req.body;
-
+    
     // Verify state parameter
     if (!req.session || req.session.state !== state) {
       return res.status(400).json({
@@ -79,12 +75,9 @@ router.post('/fayda-callback', [
       role: 'patient'
     };
 
-    // Store user in memory
     users.set(userId, user);
-
     const token = generateToken(userId);
 
-    // Clear session data
     delete req.session.state;
 
     res.status(200).json({
@@ -101,96 +94,7 @@ router.post('/fayda-callback', [
   }
 });
 
-// Legacy Fayda ID Login/Register (for direct API calls)
-router.post('/fayda-login', [
-  body('faydaId').notEmpty().withMessage('Fayda ID is required'),
-  body('email').isEmail().withMessage('Valid email is required'),
-  body('phoneNumber').notEmpty().withMessage('Phone number is required'),
-  body('firstName').notEmpty().withMessage('First name is required'),
-  body('lastName').notEmpty().withMessage('Last name is required'),
-  body('dateOfBirth').isISO8601().withMessage('Valid date of birth is required'),
-  body('gender').isIn(['male', 'female', 'other']).withMessage('Valid gender is required')
-], async (req, res) => {
-  try {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json({
-        error: 'Validation Error',
-        details: errors.array()
-      });
-    }
-
-    const {
-      faydaId,
-      email,
-      phoneNumber,
-      firstName,
-      lastName,
-      middleName,
-      dateOfBirth,
-      gender,
-      role = 'patient'
-    } = req.body;
-
-    // Check if user already exists
-    let user = await User.findOne({ where: { faydaId } });
-
-    if (user) {
-      // Update last login
-      await user.update({ lastLogin: new Date() });
-    } else {
-      // Create new user
-      user = await User.create({
-        faydaId,
-        email,
-        phoneNumber,
-        firstName,
-        lastName,
-        middleName,
-        dateOfBirth,
-        gender,
-        role,
-        lastLogin: new Date()
-      });
-
-      // If user is a patient, create patient profile
-      if (role === 'patient') {
-        await Patient.create({
-          userId: user.id,
-          emergencyContactName: '',
-          emergencyContactPhone: '',
-          emergencyContactRelation: '',
-          address: '',
-          city: '',
-          region: ''
-        });
-      }
-    }
-
-    const token = generateToken(user.id);
-
-    res.status(200).json({
-      message: 'Authentication successful',
-      token,
-      user: {
-        id: user.id,
-        faydaId: user.faydaId,
-        email: user.email,
-        firstName: user.firstName,
-        lastName: user.lastName,
-        role: user.role
-      }
-    });
-  } catch (error) {
-    console.error('Fayda login error:', error);
-    res.status(500).json({
-      error: 'Authentication Failed',
-      message: 'Unable to authenticate with Fayda ID'
-    });
-  }
-});
-
-// SMS Fallback Authentication
+// SMS Login
 router.post('/sms-login', [
   body('phoneNumber').notEmpty().withMessage('Phone number is required')
 ], async (req, res) => {
@@ -204,25 +108,18 @@ router.post('/sms-login', [
     }
 
     const { phoneNumber } = req.body;
-
-    // For testing - simulate user lookup
-    // In real implementation, this would check the database
     console.log(`SMS login attempt for phone: ${phoneNumber}`);
 
-    // Generate OTP (in production, send via SMS)
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
     
-    // Store OTP in session
     req.session = req.session || {};
     req.session.otp = otp;
     req.session.phoneNumber = phoneNumber;
 
-    // TODO: Send OTP via SMS using Twilio
     console.log(`OTP for ${phoneNumber}: ${otp}`);
 
     res.status(200).json({
       message: 'OTP sent successfully',
-      // In production, don't send OTP in response
       otp: process.env.NODE_ENV === 'development' ? otp : undefined
     });
   } catch (error) {
@@ -250,7 +147,6 @@ router.post('/verify-otp', [
 
     const { phoneNumber, otp } = req.body;
 
-    // Verify OTP (simplified for demo)
     if (!req.session || req.session.otp !== otp) {
       return res.status(400).json({
         error: 'Invalid OTP',
@@ -258,7 +154,6 @@ router.post('/verify-otp', [
       });
     }
 
-    // Create or find user for testing
     const userId = 'sms-user-' + Date.now();
     const user = {
       id: userId,
@@ -270,12 +165,9 @@ router.post('/verify-otp', [
       phoneNumber: phoneNumber
     };
 
-    // Store user in memory
     users.set(userId, user);
-
     const token = generateToken(userId);
 
-    // Clear OTP from session
     delete req.session.otp;
     delete req.session.phoneNumber;
 
@@ -291,38 +183,6 @@ router.post('/verify-otp', [
       message: 'Unable to verify OTP'
     });
   }
-});
-
-// Get current user profile
-router.get('/profile', authenticateToken, async (req, res) => {
-  try {
-    const user = users.get(req.user.id);
-
-    if (!user) {
-      return res.status(404).json({
-        error: 'User Not Found',
-        message: 'User profile not found'
-      });
-    }
-
-    res.status(200).json({
-      user
-    });
-  } catch (error) {
-    console.error('Get profile error:', error);
-    res.status(500).json({
-      error: 'Server Error',
-      message: 'Unable to fetch user profile'
-    });
-  }
-});
-
-// Logout
-router.post('/logout', authenticateToken, (req, res) => {
-  // In a production app with refresh tokens, you'd invalidate the token here
-  res.status(200).json({
-    message: 'Logout successful'
-  });
 });
 
 module.exports = router;
