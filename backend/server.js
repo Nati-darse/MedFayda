@@ -77,9 +77,9 @@ if (useDatabase) {
   app.use('/api/appointments', require('./routes/appointments'));
   app.use('/api/reminders', require('./routes/reminders'));
 
-  // Centralized medical records system
-  app.use('/api/medical-records', require('./routes/medicalRecords'));
-  app.use('/api/patient-portal', require('./routes/patientPortal'));
+  // Centralized medical records system (disabled until database is set up)
+  // app.use('/api/medical-records', require('./routes/medicalRecords'));
+  // app.use('/api/patient-portal', require('./routes/patientPortal'));
 } else {
   // Provide simple fallback endpoints for development
   app.get('/api/users', (req, res) => res.json({ message: 'Database not connected - users endpoint disabled' }));

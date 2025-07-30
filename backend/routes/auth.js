@@ -3,7 +3,6 @@ const jwt = require('jsonwebtoken');
 const { body, validationResult } = require('express-validator');
 const { authenticateToken } = require('../middleware/auth');
 
-// Try to import models and services, fallback if not available
 let User, Patient, faydaOIDCService;
 let useDatabase = true;
 const memoryUsers = new Map();
@@ -50,13 +49,11 @@ router.get('/fayda-auth', (req, res) => {
     const state = 'test-state-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9);
     const authUrl = `http://localhost:3000/auth/callback?code=test-code&state=${state}`;
 
-    // Store state in memory for verification
     sessionStore.set(state, {
       timestamp: Date.now(),
       used: false
     });
 
-    // Also store in session as backup
     req.session = req.session || {};
     req.session.state = state;
 
@@ -76,7 +73,7 @@ router.get('/fayda-auth', (req, res) => {
   }
 });
 
-// Handle OIDC callback (simplified for testing)
+// Handle OIDC callback
 router.post('/fayda-callback', [
   body('code').notEmpty().withMessage('Authorization code is required'),
   body('state').notEmpty().withMessage('State parameter is required')
@@ -96,7 +93,6 @@ router.post('/fayda-callback', [
     console.log('Session state:', req.session?.state);
     console.log('Stored states:', Array.from(sessionStore.keys()));
 
-    // Verify state parameter (check both session and memory store)
     const storedSession = sessionStore.get(state);
     const sessionValid = req.session && req.session.state === state;
     const memoryValid = storedSession && !storedSession.used;
@@ -109,15 +105,12 @@ router.post('/fayda-callback', [
       });
     }
 
-    // Mark state as used to prevent replay attacks
     if (storedSession) {
       storedSession.used = true;
     }
 
-    // Try OIDC flow first, fallback to test user
     let user;
     try {
-      // OIDC flow (when properly configured)
       const tokenSet = await faydaOIDCService.exchangeCodeForTokens(
         code,
         req.session.codeVerifier,
@@ -150,7 +143,6 @@ router.post('/fayda-callback', [
         });
       }
     } catch (oidcError) {
-      // Fallback to test user creation
       user = await User.findOne({ where: { faydaId: 'TEST123456789' } });
 
       if (!user) {
@@ -180,9 +172,17 @@ router.post('/fayda-callback', [
       }
     }
 
-    const token = generateToken(user.id);
+    let token;
+    try {
+      token = generateToken(user.id);
+    } catch (error) {
+      console.error('Token generation error:', error);
+      return res.status(500).json({
+        error: 'Token Generation Failed',
+        message: 'Unable to generate authentication token'
+      });
+    }
 
-    // Clear session data
     delete req.session.codeVerifier;
     delete req.session.state;
     delete req.session.nonce;
@@ -209,7 +209,7 @@ router.post('/fayda-callback', [
 });
 
 // Legacy Fayda ID Login/Register (for direct API calls)
-router.post('/fayda-login', [
+router.post('/fayda/login', [
   body('faydaId').notEmpty().withMessage('Fayda ID is required'),
   body('email').isEmail().withMessage('Valid email is required'),
   body('phoneNumber').notEmpty().withMessage('Phone number is required'),
@@ -239,14 +239,11 @@ router.post('/fayda-login', [
       role = 'patient'
     } = req.body;
 
-    // Check if user already exists
     let user = await User.findOne({ where: { faydaId } });
 
     if (user) {
-      // Update last login
       await user.update({ lastLogin: new Date() });
     } else {
-      // Create new user
       user = await User.create({
         faydaId,
         email,
@@ -260,7 +257,6 @@ router.post('/fayda-login', [
         lastLogin: new Date()
       });
 
-      // If user is a patient, create patient profile
       if (role === 'patient') {
         await Patient.create({
           userId: user.id,
@@ -312,19 +308,15 @@ router.post('/sms-login', [
 
     const { phoneNumber } = req.body;
 
-    // Find user by phone number or create if doesn't exist
     let user = await User.findOne({ where: { phoneNumber } });
     console.log(`SMS login attempt for phone: ${phoneNumber}`);
 
-    // Generate OTP (in production, send via SMS)
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
     
-    // Store OTP in session
     req.session = req.session || {};
     req.session.otp = otp;
     req.session.phoneNumber = phoneNumber;
 
-    // TODO: Send OTP via SMS using Twilio
     console.log(`OTP for ${phoneNumber}: ${otp}`);
 
     res.status(200).json({
@@ -357,7 +349,6 @@ router.post('/verify-otp', [
 
     const { phoneNumber, otp } = req.body;
 
-    // Verify OTP (simplified for demo)
     if (!req.session || req.session.otp !== otp) {
       return res.status(400).json({
         error: 'Invalid OTP',
@@ -365,11 +356,9 @@ router.post('/verify-otp', [
       });
     }
 
-    // Find or create user
     let user = await User.findOne({ where: { phoneNumber } });
 
     if (!user) {
-      // Create new user
       const faydaId = 'SMS' + phoneNumber.replace(/\D/g, '').slice(-9);
       user = await User.create({
         faydaId,
@@ -383,7 +372,6 @@ router.post('/verify-otp', [
         lastLogin: new Date()
       });
 
-      // Create patient profile
       await Patient.create({
         userId: user.id,
         emergencyContactName: 'Emergency Contact',
@@ -399,7 +387,6 @@ router.post('/verify-otp', [
 
     const token = generateToken(user.id);
 
-    // Clear OTP from session
     delete req.session.otp;
     delete req.session.phoneNumber;
 
@@ -456,7 +443,6 @@ router.get('/profile', authenticateToken, async (req, res) => {
 
 // Logout
 router.post('/logout', authenticateToken, (req, res) => {
-  // In a production app with refresh tokens, you'd invalidate the token here
   res.status(200).json({
     message: 'Logout successful'
   });

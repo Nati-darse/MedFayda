@@ -2,9 +2,32 @@
 
 import { FaHeartbeat, FaUserMd, FaCalendarAlt, FaShieldAlt, FaStar, FaUsers, FaLock } from 'react-icons/fa';
 import { useRouter } from 'next/navigation';
+import { useState } from 'react';
 
 export default function Home() {
   const router = useRouter();
+  const [loginError, setLoginError] = useState('');
+
+const handleFaydaLogin = async () => {
+  try {
+    const response = await fetch('http://localhost:5000/api/auth/fayda/login', {
+      method: 'GET', // Change to GET
+      credentials: 'include', // Include credentials for session support
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to initiate Fayda ID authentication');
+    }
+
+    const data = await response.json();
+    console.log('Fayda login response:', data);
+    // Handle successful response (e.g., redirect to data.authUrl)
+    window.location.href = data.authUrl; // Redirect to Fayda authentication URL
+  } catch (error) {
+    console.error('Fayda login error:', error);
+    setLoginError(error.message); // Set error message to display
+  }
+};
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-green-50">
@@ -69,7 +92,7 @@ export default function Home() {
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
               <button
                 className="group relative px-8 py-4 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-xl font-semibold text-lg shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300 flex items-center space-x-2"
-                onClick={() => router.push('/auth/login')}
+                onClick={handleFaydaLogin}
               >
                 <FaShieldAlt className="w-5 h-5" />
                 <span>Login with Fayda ID</span>
@@ -82,6 +105,9 @@ export default function Home() {
                 <span>SMS Login</span>
               </button>
             </div>
+
+            {/* Display Login Error */}
+            {loginError && <div className="text-red-500">{loginError}</div>}
           </div>
         </div>
       </div>
