@@ -1,233 +1,144 @@
-# 🏥 MedFayda - Centralized Health Record Management System
+# 🏥 MedFayda - Centralized Health Records System
 
-**Solving Ethiopia's Healthcare Data Fragmentation**
+> **Empowering Ethiopia's healthcare system with secure, accessible medical records**
 
-A comprehensive, centralized health record management system that eliminates unshared patient data across health centers in Ethiopia. Integrated with Ethiopia's Fayda ID for secure authentication, enabling patients, doctors, and lab technicians to access unified medical records nationwide using the patient's Fayda ID Number (FIN).
+A comprehensive healthcare management platform for Ethiopia, providing centralized medical records, patient portals, and healthcare provider tools.
 
-  
----
+## ✨ Features
 
-## Contributors  
-- Natnael Darsema
-- Kidus Paulos
-- Foziya Fetudin
+### 👥 **Patient Portal**
+- **Fayda ID Integration** - Secure authentication using Ethiopia's national ID system
+- **SMS Authentication** - Alternative login method for accessibility  
+- **Medical Records** - Complete health history with lab results, medications, and treatments
+- **Appointment Management** - Schedule and manage healthcare appointments
+- **Medication Tracking** - Track prescriptions and medication reminders
+- **Profile Management** - Update personal and emergency contact information
 
----
+### 👨‍⚕️ **Doctor Portal**  
+- **Professional Authentication** - License-based secure access
+- **Patient Lookup** - FIN-based centralized patient record access
+- **Medical Record Creation** - Add new consultations, treatments, and diagnoses
+- **Cross-Hospital Access** - View patient records from any participating health center
 
-## Project Synopsis  
-
-### Problem Statement  
-Ethiopia’s healthcare system struggles with:  
-- **Fragmented patient records** across hospitals.  
-- **No centralized system** to access medical history.  
-- **Identity verification challenges** during emergencies.  
-
-### Planned Solution  
-MedFayda solves this by:  
-- **Fayda ID authentication** (OIDC integration) for secure login.  
-- **Unified health records** linked to Fayda IDs.  
-- **Real-time access** for doctors with patient consent.  
-- **SMS fallback** for areas with poor internet.  
-
-### Expected Outcome  
-- **faster diagnosis** with instant record access.  
-- **Reduced duplicate tests**, saving costs.  
-- **Secure, nationwide scalability** via Fayda.  
-
-### Fayda’s Role  
-- **Primary identity verification** (government-backed trust).  
-- **OIDC integration** for seamless authentication.  
-- **Compliance** with national digital ID standards.  
-
----
-
-## ✨ Core Features
-
-### 🌍 **Centralized Data Access**
-- **Nationwide Patient Records** - Single database accessible by all health centers
-- **FIN-Based Lookup** - Doctors can access patient records using Fayda ID Number
-- **Real-Time Synchronization** - Instant updates across all health facilities
-- **Paper-to-Digital Transition** - Complete digitization of medical records
-
-### 🔐 **Secure Authentication & Access**
-- **Fayda ID Integration** - Government-grade authentication system
-- **Role-Based Access Control** - Patients, doctors, lab technicians, administrators
-- **SMS Backup Authentication** - Alternative access for rural areas
-- **End-to-End Encryption** - AES-256 encryption for all sensitive data
-
-### 🏥 **Multi-Portal System**
-- **Patient Portal** - View medical history, medication reminders, appointments
-- **Doctor Portal** - Access/update patient records, add diagnoses, prescriptions
-- **Lab Technician Portal** - View records, add lab results and test data
-- **Admin Portal** - System management without medical data access
-
-### 🛡️ **Privacy & Security**
-- **ISO 27001 Compliant** - International security standards
-- **HIPAA-Level Protection** - Healthcare data privacy compliance
-- **Comprehensive Audit Logging** - Track all data access and modifications
-- **Data Minimization** - Store only essential data, fetch from Fayda ID on-demand
-
-## 🐳 Installation and Deployment
+## 🚀 Quick Start
 
 ### Prerequisites
+- **Node.js** 18.0.0 or higher
+- **PostgreSQL** 15 or higher (optional - works with mock data)
+- **npm** 8.0.0 or higher
 
-- Docker 20.10+
-- Docker Compose 2.0+
-- Node.js 18+ (for local development)
-- PostgreSQL 12+ (for local development)
+### Installation
 
-### Option 1: Docker Deployment (Recommended)
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/your-org/medfayda.git
+   cd medfayda
+   ```
 
-**1. Clone the repository:**
+2. **Setup Backend**
+   ```bash
+   cd backend
+   npm install
+   npm run dev
+   ```
 
-```bash
-git clone https://github.com/Nati-darse/MedFayda.git
-cd MedFayda
+3. **Setup Frontend** (in a new terminal)
+   ```bash
+   cd frontend  
+   npm install
+   npm run dev
+   ```
+
+4. **Access the application**
+   - **Frontend**: http://localhost:3000
+   - **Backend API**: http://localhost:5000
+
+## 📁 Project Structure
+
+```
+MedFayda/
+├── 📁 backend/              # Node.js/Express API server
+│   ├── 📁 config/          # Database and app configuration
+│   ├── 📁 middleware/      # Express middleware
+│   ├── 📁 models/          # Database models (Sequelize)
+│   ├── 📁 routes/          # API routes
+│   ├── 📁 services/        # Business logic services
+│   └── server.js           # Main server file
+│
+├── 📁 frontend/            # Next.js React application
+│   ├── 📁 src/app/         # Next.js app directory
+│   ├── 📁 public/          # Static assets
+│   └── package.json        # Frontend dependencies
+│
+└── README.md               # This file
 ```
 
-**2. Deploy with Docker Compose:**
+## 🧪 Demo Credentials
 
-```bash
-# Build and start all services
-docker-compose up -d
+### **Patient Portal**
+- **Fayda ID Login**: Automatic mock authentication
+- **SMS Login**: Any phone number + any 6-digit OTP
 
-# View logs
-docker-compose logs -f
+### **Doctor Portal**  
+- **License**: `MD001` | **Hospital**: `HC001` | **Password**: `doctor123`
+- **License**: `MD002` | **Hospital**: `HC002` | **Password**: `doctor123`
 
-# Stop services
-docker-compose down
-```
-
-**3. Access the application:**
-
-- **Frontend**: http://localhost:3000
-- **Backend API**: http://localhost:5000
-- **Database**: PostgreSQL on localhost:5432
-
-### Option 2: Manual Local Development
-
-**1. Set up PostgreSQL:**
-
-```sql
-psql -U postgres
-CREATE DATABASE medfayda;
-CREATE USER medfayda_user WITH PASSWORD 'your_secure_password';
-GRANT ALL PRIVILEGES ON DATABASE medfayda TO medfayda_user;
-```
-
-**2. Backend setup:**
-
-```bash
-cd backend
-npm install
-# Edit .env with your database credentials
-npm start
-```
-
-**3. Frontend setup:**
-
-```bash
-cd frontend
-npm install
-npm run dev
-```
-
-### Docker Commands Reference
-
-```bash
-# Build specific service
-docker-compose build backend
-docker-compose build frontend
-
-# Restart specific service
-docker-compose restart backend
-
-# View service logs
-docker-compose logs backend
-docker-compose logs frontend
-docker-compose logs postgres
-
-# Execute commands in running container
-docker-compose exec backend npm run migrate
-docker-compose exec postgres psql -U medfayda_user -d medfayda
-
-# Clean up everything
-docker-compose down -v --remove-orphans
-docker system prune -a
-```
+### **Patient FINs for Doctor Lookup**
+- `FIN1753873082364` - Mock User
+- `SMS911234567` - SMS User  
+- `DOC001234567` - Test Patient
 
 ## 🛠️ Technology Stack
 
-### Backend
+**Backend:**
+- **Node.js** with Express.js
+- **PostgreSQL** with Sequelize ORM
+- **JWT** authentication
+- **Security middleware** (Helmet, CORS, Rate limiting)
 
-- **Node.js** - Runtime environment
-- **Express.js** - Web framework
-- **PostgreSQL** - Primary database
-- **Sequelize** - ORM for database operations
-- **JWT** - Authentication tokens
+**Frontend:**
+- **Next.js 14** with App Router
+- **React 18** with modern hooks
+- **Tailwind CSS** for styling
+- **Responsive design** for all devices
 
-### Frontend
+## 💻 Development
 
-- **Next.js 14** - React framework
-- **JavaScript** - Programming language
-- **Tailwind CSS** - Utility-first CSS framework
-- **React Icons** - Icon library
+```bash
+# Backend development
+cd backend
+npm run dev
 
-## 🔐 Authentication Flow
+# Frontend development  
+cd frontend
+npm run dev
 
-### Fayda ID Login
-
-1. User clicks "Login with Fayda ID"
-2. Redirected to official Fayda ID server
-3. User authenticates with government credentials
-4. System receives authorization code
-5. Backend exchanges code for user information
-6. User profile created/updated in database
-7. JWT token issued for session management
-
-### SMS Login (Backup)
-
-1. User enters phone number
-2. System sends 6-digit OTP
-3. User enters verification code
-4. System validates OTP
-5. User account created/authenticated
-6. JWT token issued
-
-## 🛡️ Security Features
-
-- **End-to-end encryption** for sensitive data
-- **Government-grade authentication** via Fayda ID
-- **Role-based access control** (RBAC)
-- **Audit logging** for all medical record access
-- **HIPAA-compliant** data handling
-
-## 🚀 Production Deployment
-
-### Environment Variables
-
-Create `.env` files with:
-
-```env
-# Backend (.env)
-DB_HOST=postgres
-DB_PORT=5432
-DB_NAME=medfayda
-DB_USER=medfayda_user
-DB_PASSWORD=secure_password_2024
-JWT_SECRET=your_super_secure_jwt_secret_key_2024
-JWT_EXPIRES_IN=24h
-SESSION_SECRET=your_super_secure_session_secret_2024
-PORT=5000
-FRONTEND_URL=http://localhost:3000
+# Build for production
+cd backend && npm run build
+cd frontend && npm run build
 ```
 
-### Health Checks
+## 🔒 Security Features
 
-- **Backend**: `GET /health`
-- **Database**: Automatic health checks in Docker
-- **Frontend**: Built-in Next.js health monitoring
+- **Government-grade security** standards
+- **Fayda ID integration** for national authentication
+- **JWT tokens** with secure expiration
+- **Rate limiting** to prevent abuse
+- **CORS protection** for cross-origin requests
+- **Input validation** and sanitization
 
----
+## 🇪🇹 Ethiopian Healthcare Integration
 
-**Built with ❤️ for Ethiopia's healthcare future** 🇪🇹
+- **Ministry of Health** API compatibility
+- **Health Centers Registry** integration
+- **Ethiopian regions** and cities support
+- **Local healthcare standards** compliance
+
+## 👥 Contributors
+- **Natnael Darsema**
+- **Kidus Paulos**
+- **Foziya Fetudin**
+
+## 📄 License
+
+MIT License - Built with ❤️ for Ethiopia's healthcare future 🇪🇹
