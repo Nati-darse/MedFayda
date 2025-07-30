@@ -1,0 +1,70 @@
+# MedFayda Frontend Web Dockerfile
+FROM node:18-alpine AS base
+
+# Install system dependencies
+RUN apk add --no-cache libc6-compat curl
+
+# Set timezone to Ethiopia
+ENV TZ=Africa/Addis_Ababa
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
+
+# Create app directory
+WORKDIR /app
+
+# Create non-root user
+RUN addgroup -g 1001 -S nodejs && \
+    adduser -S nextjs -u 1001
+
+# Install dependencies
+FROM base AS deps
+COPY src/client/package*.json ./
+RUN npm ci
+
+# Development stage
+FROM base AS development
+COPY --from=deps /app/node_modules ./node_modules
+COPY src/client/ ./
+USER nextjs
+EXPOSE 3000
+ENV PORT 3000
+ENV HOSTNAME "0.0.0.0"
+CMD ["npm", "run", "dev"]
+
+# Build stage
+FROM base AS builder
+COPY --from=deps /app/node_modules ./node_modules
+COPY src/client/ ./
+
+# Set build-time environment variables
+ENV NEXT_TELEMETRY_DISABLED 1
+ENV NODE_ENV production
+
+# Build the application
+RUN npm run build
+
+# Production stage
+FROM base AS production
+
+ENV NODE_ENV production
+ENV NEXT_TELEMETRY_DISABLED 1
+
+# Copy built application
+COPY --from=builder /app/public ./public
+COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
+COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+    CMD curl -f http://localhost:3000/api/health || exit 1
+
+# Switch to non-root user
+USER nextjs
+
+# Expose port
+EXPOSE 3000
+
+ENV PORT 3000
+ENV HOSTNAME "0.0.0.0"
+
+# Start the application
+CMD ["node", "server.js"]

@@ -1,0 +1,79 @@
+{
+  "name": "medfayda",
+  "version": "1.0.0",
+  "description": "Centralized Health Records System for Ethiopia",
+  "main": "src/server/server.js",
+  "private": true,
+  "workspaces": [
+    "src/server",
+    "src/client"
+  ],
+  "scripts": {
+    "dev": "concurrently \"npm run dev:server\" \"npm run dev:client\"",
+    "dev:server": "cd src/server && npm run dev",
+    "dev:client": "cd src/client && npm run dev",
+    "build": "npm run build:server && npm run build:client",
+    "build:server": "cd src/server && npm run build",
+    "build:client": "cd src/client && npm run build",
+    "start": "cd src/server && npm start",
+    "test": "npm run test:server && npm run test:client",
+    "test:server": "cd src/server && npm test",
+    "test:client": "cd src/client && npm test",
+    "lint": "npm run lint:server && npm run lint:client",
+    "lint:server": "cd src/server && npm run lint",
+    "lint:client": "cd src/client && npm run lint",
+    "format": "prettier --write \"**/*.{js,jsx,ts,tsx,json,md}\"",
+    "setup": "npm install && npm run setup:server && npm run setup:client",
+    "setup:server": "cd src/server && npm install",
+    "setup:client": "cd src/client && npm install",
+    "docker:build": "docker-compose build",
+    "docker:up": "docker-compose up -d",
+    "docker:down": "docker-compose down",
+    "db:migrate": "cd src/server && npm run db:migrate",
+    "db:seed": "cd src/server && npm run db:seed",
+    "db:reset": "cd src/server && npm run db:reset"
+  },
+  "keywords": [
+    "healthcare",
+    "medical-records",
+    "ethiopia",
+    "fayda-id",
+    "centralized-health",
+    "patient-portal",
+    "doctor-portal"
+  ],
+  "author": "MedFayda Development Team",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/your-org/medfayda.git"
+  },
+  "bugs": {
+    "url": "https://github.com/your-org/medfayda/issues"
+  },
+  "homepage": "https://github.com/your-org/medfayda#readme",
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=8.0.0"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2",
+    "prettier": "^3.0.0",
+    "husky": "^8.0.3",
+    "lint-staged": "^15.0.0"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  },
+  "lint-staged": {
+    "*.{js,jsx,ts,tsx}": [
+      "prettier --write",
+      "eslint --fix"
+    ],
+    "*.{json,md}": [
+      "prettier --write"
+    ]
+  }
+}
