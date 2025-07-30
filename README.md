@@ -4,6 +4,34 @@
 
 A comprehensive healthcare management platform for Ethiopia, providing centralized medical records, patient portals, and healthcare provider tools.
 
+
+## Project Synopsis  
+
+### Problem Statement  
+Ethiopia’s healthcare system struggles with:  
+- Fragmented patient records across hospitals.  
+- No centralized system to access medical history.  
+- Identity verification challenges during emergencies.  
+
+### Planned Solution  
+MedFayda solves this by:  
+- Fayda ID authentication (OIDC integration) for secure login.  
+- Unified health records linked to Fayda IDs.  
+- Real-time access for doctors with patient consent.  
+- SMS fallback for areas with poor internet.  
+
+### Expected Outcome  
+- faster diagnosis with instant record access.  
+- Reduced duplicate tests, saving costs.  
+- Secure, nationwide scalability via Fayda.  
+
+### Fayda’s Role  
+- Primary identity verification (government-backed trust).  
+- OIDC integration for seamless authentication.  
+- Compliance with national digital ID standards.  
+
+---
+
 ## ✨ Features
 
 ### 👥 **Patient Portal**

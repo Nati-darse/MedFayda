@@ -43,8 +43,24 @@ setInterval(() => {
   }
 }, 5 * 60 * 1000);
 
+// Test endpoint
+router.get('/test', (req, res) => {
+  res.json({
+    message: 'MedFayda Auth API is working!',
+    timestamp: new Date().toISOString(),
+    routes: [
+      'GET /api/auth/test',
+      'GET /api/auth/fayda/login',
+      'POST /api/auth/fayda/callback',
+      'POST /api/auth/sms/send-otp',
+      'POST /api/auth/sms/verify-otp',
+      'POST /api/auth/logout'
+    ]
+  });
+});
+
 // Start Fayda ID OIDC authentication
-router.get('/fayda-auth', (req, res) => {
+router.get('/fayda/login', (req, res) => {
   try {
     const state = 'test-state-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9);
     const authUrl = `http://localhost:3000/auth/callback?code=test-code&state=${state}`;
@@ -74,7 +90,7 @@ router.get('/fayda-auth', (req, res) => {
 });
 
 // Handle OIDC callback
-router.post('/fayda-callback', [
+router.post('/fayda/callback', [
   body('code').notEmpty().withMessage('Authorization code is required'),
   body('state').notEmpty().withMessage('State parameter is required')
 ], async (req, res) => {
@@ -294,7 +310,7 @@ router.post('/fayda/login', [
 });
 
 // SMS Fallback Authentication
-router.post('/sms-login', [
+router.post('/sms/send-otp', [
   body('phoneNumber').notEmpty().withMessage('Phone number is required')
 ], async (req, res) => {
   try {
@@ -334,7 +350,7 @@ router.post('/sms-login', [
 });
 
 // Verify OTP
-router.post('/verify-otp', [
+router.post('/sms/verify-otp', [
   body('phoneNumber').notEmpty().withMessage('Phone number is required'),
   body('otp').isLength({ min: 6, max: 6 }).withMessage('OTP must be 6 digits')
 ], async (req, res) => {
