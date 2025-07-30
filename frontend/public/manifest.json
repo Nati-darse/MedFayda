@@ -1,0 +1,27 @@
+{
+  "name": "MedFayda - Health Record Management System",
+  "short_name": "MedFayda",
+  "description": "Secure health record access system integrated with Fayda ID for Ethiopia",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#0099CC",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/medical-heart-icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/favicon.svg",
+      "sizes": "32x32",
+      "type": "image/svg+xml"
+    }
+  ],
+  "categories": ["health", "medical", "productivity"],
+  "lang": "en",
+  "scope": "/",
+  "id": "medfayda-health-records"
+}

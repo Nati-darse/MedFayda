@@ -2,6 +2,7 @@
 
 import { FaHeartbeat, FaUserMd, FaCalendarAlt, FaShieldAlt, FaStar, FaUsers, FaLock, FaUser } from 'react-icons/fa';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 import { useState } from 'react';
 
 export default function Home() {
@@ -45,7 +46,16 @@ const handleFaydaLogin = async () => {
             <div className="flex items-center justify-center space-x-4 mb-8">
               <div className="relative">
                 <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-green-500 rounded-full blur-lg opacity-30 animate-pulse"></div>
-                <FaHeartbeat className="relative w-16 h-16 text-red-500 animate-pulse" />
+                <div className="relative w-16 h-16 animate-pulse">
+                  <Image
+                    src="/medical-heart-icon.svg"
+                    alt="MedFayda Medical Heart Icon"
+                    width={64}
+                    height={64}
+                    className="w-full h-full"
+                    priority
+                  />
+                </div>
               </div>
               <div>
                 <h1 className="text-5xl md:text-6xl font-bold bg-gradient-to-r from-blue-600 to-green-600 bg-clip-text text-transparent">

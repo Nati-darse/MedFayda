@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MedFayda Icon Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        .container {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            text-align: center;
+            max-width: 500px;
+        }
+        .icon-showcase {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            margin: 30px 0;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        .icon-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+        .icon-large {
+            width: 80px;
+            height: 80px;
+            animation: pulse 2s infinite;
+        }
+        .icon-medium {
+            width: 48px;
+            height: 48px;
+        }
+        .icon-small {
+            width: 32px;
+            height: 32px;
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+        p {
+            color: #666;
+            margin-bottom: 20px;
+        }
+        .success {
+            color: #28a745;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🏥 MedFayda Medical Heart Icon</h1>
+        <p>Testing the new medical heart icon implementation</p>
+        
+        <div class="icon-showcase">
+            <div class="icon-item">
+                <img src="/medical-heart-icon.svg" alt="Large Icon" class="icon-large">
+                <span>Large (80px)</span>
+            </div>
+            <div class="icon-item">
+                <img src="/medical-heart-icon.svg" alt="Medium Icon" class="icon-medium">
+                <span>Medium (48px)</span>
+            </div>
+            <div class="icon-item">
+                <img src="/medical-heart-icon.svg" alt="Small Icon" class="icon-small">
+                <span>Small (32px)</span>
+            </div>
+        </div>
+        
+        <div class="icon-showcase">
+            <div class="icon-item">
+                <img src="/favicon.svg" alt="Favicon" class="icon-small">
+                <span>Favicon</span>
+            </div>
+        </div>
+        
+        <p class="success">✅ Icons loaded successfully!</p>
+        <p>The medical heart icon is now integrated into:</p>
+        <ul style="text-align: left; display: inline-block;">
+            <li>Main page header</li>
+            <li>Dashboard header</li>
+            <li>Doctor portal header</li>
+            <li>Doctor login page</li>
+            <li>Browser favicon</li>
+            <li>Web app manifest</li>
+        </ul>
+    </div>
+</body>
+</html>

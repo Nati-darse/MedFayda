@@ -15,6 +15,7 @@ import {
 } from 'react-icons/fa';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
+import Image from 'next/image';
 
 export default function DashboardPage() {
   const router = useRouter();
@@ -75,8 +76,16 @@ export default function DashboardPage() {
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
               <div className="relative">
-                <div className="absolute inset-0 bg-gradient-to-r from-red-500 to-pink-500 rounded-full blur-lg opacity-30 animate-pulse"></div>
-                <FaHeartbeat className="relative w-10 h-10 text-red-500" />
+                <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-green-500 rounded-full blur-lg opacity-30 animate-pulse"></div>
+                <div className="relative w-10 h-10">
+                  <Image
+                    src="/medical-heart-icon.svg"
+                    alt="MedFayda Medical Heart Icon"
+                    width={40}
+                    height={40}
+                    className="w-full h-full"
+                  />
+                </div>
               </div>
               <div>
                 <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-green-600 bg-clip-text text-transparent">

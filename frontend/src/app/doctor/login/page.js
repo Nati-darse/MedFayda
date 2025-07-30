@@ -13,6 +13,7 @@ import {
   FaIdCard,
   FaHospital
 } from 'react-icons/fa';
+import Image from 'next/image';
 
 export default function DoctorLogin() {
   const router = useRouter();
@@ -125,8 +126,14 @@ export default function DoctorLogin() {
         <div className="text-center mb-8">
           <div className="relative mx-auto w-20 h-20 mb-4">
             <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-green-500 rounded-full blur-lg opacity-30 animate-pulse"></div>
-            <div className="relative w-20 h-20 bg-gradient-to-r from-blue-500 to-green-500 rounded-full flex items-center justify-center">
-              <FaHeartbeat className="w-10 h-10 text-white" />
+            <div className="relative w-20 h-20 bg-gradient-to-r from-blue-500 to-green-500 rounded-full flex items-center justify-center p-4">
+              <Image
+                src="/medical-heart-icon.svg"
+                alt="MedFayda Medical Heart Icon"
+                width={48}
+                height={48}
+                className="w-full h-full"
+              />
             </div>
           </div>
           <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-green-600 bg-clip-text text-transparent mb-2">

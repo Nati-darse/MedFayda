@@ -15,6 +15,7 @@ import {
   FaChartLine,
   FaBell
 } from 'react-icons/fa';
+import Image from 'next/image';
 
 export default function DoctorDashboard() {
   const router = useRouter();
@@ -74,8 +75,14 @@ export default function DoctorDashboard() {
         <div className="max-w-7xl mx-auto py-4 px-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
-              <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-green-500 rounded-full flex items-center justify-center">
-                <FaUserMd className="w-6 h-6 text-white" />
+              <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-green-500 rounded-full flex items-center justify-center p-2">
+                <Image
+                  src="/medical-heart-icon.svg"
+                  alt="MedFayda Medical Heart Icon"
+                  width={32}
+                  height={32}
+                  className="w-full h-full"
+                />
               </div>
               <div>
                 <h1 className="text-2xl font-bold text-gray-800">MedFayda Doctor Portal</h1>
