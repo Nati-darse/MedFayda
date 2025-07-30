@@ -34,17 +34,8 @@ export default function DashboardPage() {
       const parsedUser = JSON.parse(userData);
       setUser(parsedUser);
 
-      // Redirect doctors to doctor portal
-      if (parsedUser.role === 'doctor') {
-        router.push('/doctor');
-        return;
-      }
-
-      // Redirect lab technicians to lab portal
-      if (parsedUser.role === 'lab_technician') {
-        router.push('/lab');
-        return;
-      }
+      // Note: Removed automatic redirects to allow users to choose their portal
+      // Users can access different portals through navigation buttons
 
     } catch (error) {
       console.error('Error parsing user data:', error);
@@ -205,7 +196,10 @@ export default function DashboardPage() {
 
           {/* Quick Actions */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <div className="group bg-white rounded-xl shadow-lg p-6 cursor-pointer hover:shadow-xl transform hover:-translate-y-2 transition-all duration-300 border border-gray-100">
+            <div
+              onClick={() => router.push('/patient/profile')}
+              className="group bg-white rounded-xl shadow-lg p-6 cursor-pointer hover:shadow-xl transform hover:-translate-y-2 transition-all duration-300 border border-gray-100"
+            >
               <div className="flex flex-col items-center space-y-4 text-center">
                 <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
                   <FaUser className="w-8 h-8 text-white" />
@@ -219,7 +213,10 @@ export default function DashboardPage() {
               </div>
             </div>
 
-            <div className="group bg-white rounded-xl shadow-lg p-6 cursor-pointer hover:shadow-xl transform hover:-translate-y-2 transition-all duration-300 border border-gray-100">
+            <div
+              onClick={() => router.push('/patient/records')}
+              className="group bg-white rounded-xl shadow-lg p-6 cursor-pointer hover:shadow-xl transform hover:-translate-y-2 transition-all duration-300 border border-gray-100"
+            >
               <div className="flex flex-col items-center space-y-4 text-center">
                 <div className="w-16 h-16 bg-gradient-to-r from-green-500 to-green-600 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
                   <FaFileAlt className="w-8 h-8 text-white" />
@@ -233,7 +230,10 @@ export default function DashboardPage() {
               </div>
             </div>
 
-            <div className="group bg-white rounded-xl shadow-lg p-6 cursor-pointer hover:shadow-xl transform hover:-translate-y-2 transition-all duration-300 border border-gray-100">
+            <div
+              onClick={() => router.push('/patient/appointments')}
+              className="group bg-white rounded-xl shadow-lg p-6 cursor-pointer hover:shadow-xl transform hover:-translate-y-2 transition-all duration-300 border border-gray-100"
+            >
               <div className="flex flex-col items-center space-y-4 text-center">
                 <div className="w-16 h-16 bg-gradient-to-r from-purple-500 to-purple-600 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
                   <FaCalendarAlt className="w-8 h-8 text-white" />
@@ -247,15 +247,18 @@ export default function DashboardPage() {
               </div>
             </div>
 
-            <div className="group bg-white rounded-xl shadow-lg p-6 cursor-pointer hover:shadow-xl transform hover:-translate-y-2 transition-all duration-300 border border-gray-100">
+            <div
+              onClick={() => router.push('/patient/medications')}
+              className="group bg-white rounded-xl shadow-lg p-6 cursor-pointer hover:shadow-xl transform hover:-translate-y-2 transition-all duration-300 border border-gray-100"
+            >
               <div className="flex flex-col items-center space-y-4 text-center">
                 <div className="w-16 h-16 bg-gradient-to-r from-orange-500 to-orange-600 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-                  <FaBell className="w-8 h-8 text-white" />
+                  <FaPills className="w-8 h-8 text-white" />
                 </div>
                 <div className="space-y-2">
-                  <h3 className="font-bold text-gray-800 text-lg">Reminders</h3>
+                  <h3 className="font-bold text-gray-800 text-lg">Medications</h3>
                   <p className="text-sm text-gray-600">
-                    Medication and checkup reminders
+                    Track prescriptions and reminders
                   </p>
                 </div>
               </div>
