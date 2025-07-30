@@ -6,6 +6,9 @@ const Patient = require('./Patient');
 const HealthRecord = require('./HealthRecord');
 const Appointment = require('./Appointment');
 const Reminder = require('./Reminder');
+const MedicalRecord = require('./MedicalRecord');
+const AuditLog = require('./AuditLog');
+const HealthCenter = require('./HealthCenter');
 
 // Define associations
 User.hasOne(Patient, {
@@ -90,5 +93,8 @@ module.exports = {
   Patient,
   HealthRecord,
   Appointment,
-  Reminder
+  Reminder,
+  MedicalRecord,
+  AuditLog,
+  HealthCenter
 };

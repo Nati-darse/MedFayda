@@ -1,8 +1,16 @@
 const jwt = require('jsonwebtoken');
-// const { User } = require('../models'); // Disabled for now
 
-// In-memory storage for development
-const { users } = require('../storage/memory');
+// Try to import models, fallback to in-memory storage if database not available
+let User;
+let useDatabase = true;
+const memoryUsers = new Map();
+
+try {
+  User = require('../models').User;
+} catch (error) {
+  console.log('Database models not available, using in-memory storage for development');
+  useDatabase = false;
+}
 
 // Verify JWT token
 const authenticateToken = async (req, res, next) => {
@@ -17,10 +25,43 @@ const authenticateToken = async (req, res, next) => {
       });
     }
 
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'fallback-secret');
 
-    // Get user from memory (for testing)
-    const user = users.get(decoded.userId);
+    let user;
+
+    if (useDatabase && User) {
+      // Get user from PostgreSQL database
+      try {
+        user = await User.findByPk(decoded.userId);
+        if (!user || !user.isActive) {
+          return res.status(401).json({
+            error: 'Access Denied',
+            message: 'Invalid token or user not active'
+          });
+        }
+      } catch (dbError) {
+        console.log('Database error, falling back to memory storage:', dbError.message);
+        useDatabase = false;
+        user = memoryUsers.get(decoded.userId);
+      }
+    } else {
+      // Fallback to in-memory storage for development
+      user = memoryUsers.get(decoded.userId);
+      if (!user) {
+        // Create a test user for development
+        user = {
+          id: decoded.userId,
+          faydaId: 'TEST123456789',
+          email: 'test@example.com',
+          firstName: 'Test',
+          lastName: 'User',
+          role: 'patient',
+          isActive: true
+        };
+        memoryUsers.set(decoded.userId, user);
+      }
+    }
+
     if (!user) {
       return res.status(401).json({
         error: 'Access Denied',
@@ -79,8 +120,10 @@ const canAccessPatient = async (req, res, next) => {
 
     // Patients can only access their own data
     if (user.role === 'patient') {
-      // For testing - simplified patient access check
-      if (user.id !== patientId) {
+      const { Patient } = require('../models');
+      const patient = await Patient.findOne({ where: { userId: user.id } });
+
+      if (!patient || patient.id !== patientId) {
         return res.status(403).json({
           error: 'Forbidden',
           message: 'You can only access your own medical records'

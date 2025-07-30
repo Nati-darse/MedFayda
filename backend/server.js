@@ -6,7 +6,16 @@ const rateLimit = require('express-rate-limit');
 const session = require('express-session');
 require('dotenv').config();
 
-// const { sequelize } = require('./models'); // Disabled for testing
+// Try to import database, fallback if not available
+let sequelize;
+let useDatabase = true;
+
+try {
+  sequelize = require('./models').sequelize;
+} catch (error) {
+  console.log('Database not available, running in development mode without database');
+  useDatabase = false;
+}
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -56,14 +65,31 @@ app.get('/health', (req, res) => {
   });
 });
 
-// API routes
-app.use('/api/auth', require('./routes/auth'));
-// Temporarily disabled routes that require database
-// app.use('/api/users', require('./routes/users'));
-// app.use('/api/patients', require('./routes/patients'));
-// app.use('/api/health-records', require('./routes/healthRecords'));
-// app.use('/api/appointments', require('./routes/appointments'));
-// app.use('/api/reminders', require('./routes/reminders'));
+// Authentication routes
+app.use('/api/auth', require('./routes/betterAuth'));
+
+// Only enable database-dependent routes if database is available
+if (useDatabase) {
+  // Core system routes
+  app.use('/api/users', require('./routes/users'));
+  app.use('/api/patients', require('./routes/patients'));
+  app.use('/api/health-records', require('./routes/healthRecords'));
+  app.use('/api/appointments', require('./routes/appointments'));
+  app.use('/api/reminders', require('./routes/reminders'));
+
+  // Centralized medical records system
+  app.use('/api/medical-records', require('./routes/medicalRecords'));
+  app.use('/api/patient-portal', require('./routes/patientPortal'));
+} else {
+  // Provide simple fallback endpoints for development
+  app.get('/api/users', (req, res) => res.json({ message: 'Database not connected - users endpoint disabled' }));
+  app.get('/api/patients', (req, res) => res.json({ message: 'Database not connected - patients endpoint disabled' }));
+  app.get('/api/health-records', (req, res) => res.json({ message: 'Database not connected - health records endpoint disabled' }));
+  app.get('/api/appointments', (req, res) => res.json({ message: 'Database not connected - appointments endpoint disabled' }));
+  app.get('/api/reminders', (req, res) => res.json({ message: 'Database not connected - reminders endpoint disabled' }));
+  app.get('/api/medical-records', (req, res) => res.json({ message: 'Database not connected - medical records endpoint disabled' }));
+  app.get('/api/patient-portal', (req, res) => res.json({ message: 'Database not connected - patient portal endpoint disabled' }));
+}
 
 // Error handling middleware
 app.use((err, req, res, next) => {
@@ -100,16 +126,35 @@ app.use('*', (req, res) => {
 // Database connection and server startup
 async function startServer() {
   try {
-    // Skip database connection for now - use in-memory storage
-    console.log('Starting server without database (development mode)');
+    if (useDatabase && sequelize) {
+      try {
+        await sequelize.authenticate();
+        console.log('✅ PostgreSQL database connection established successfully.');
+
+        // Sync database (create tables if they don't exist)
+        if (process.env.NODE_ENV === 'development') {
+          await sequelize.sync({ alter: true });
+          console.log('✅ Database synchronized successfully.');
+        }
+      } catch (dbError) {
+        console.log('⚠️  Database connection failed, running in development mode without database');
+        console.log('💡 To use database features, ensure PostgreSQL is running and configured');
+        useDatabase = false;
+      }
+    }
 
     app.listen(PORT, () => {
-      console.log(`Server is running on port ${PORT}`);
-      console.log(`Environment: ${process.env.NODE_ENV}`);
-      console.log('Note: Running without database - using in-memory storage');
+      console.log(`🚀 Server is running on port ${PORT}`);
+      console.log(`🌍 Environment: ${process.env.NODE_ENV || 'development'}`);
+      if (useDatabase) {
+        console.log(`🗄️  Using PostgreSQL database`);
+      } else {
+        console.log(`🧪 Running in development mode (in-memory storage)`);
+        console.log(`💡 Set up PostgreSQL to enable full database features`);
+      }
     });
   } catch (error) {
-    console.error('Unable to start server:', error);
+    console.error('❌ Unable to start server:', error);
     process.exit(1);
   }
 }

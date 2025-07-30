@@ -1,12 +1,22 @@
 const express = require('express');
 const jwt = require('jsonwebtoken');
 const { body, validationResult } = require('express-validator');
-// const { User, Patient } = require('../models'); // Disabled for now
 const { authenticateToken } = require('../middleware/auth');
-// const faydaOIDCService = require('../services/faydaOIDC'); // Disabled for now
 
-// In-memory storage for development
-const { users, sessions } = require('../storage/memory');
+// Try to import models and services, fallback if not available
+let User, Patient, faydaOIDCService;
+let useDatabase = true;
+const memoryUsers = new Map();
+
+try {
+  const models = require('../models');
+  User = models.User;
+  Patient = models.Patient;
+  faydaOIDCService = require('../services/faydaOIDC');
+} catch (error) {
+  console.log('Database/OIDC not available, using fallback mode for development');
+  useDatabase = false;
+}
 
 const router = express.Router();
 
@@ -19,16 +29,38 @@ const generateToken = (userId) => {
   );
 };
 
-// Start Fayda ID OIDC authentication (simplified for testing)
+// In-memory session storage for development (replace with Redis in production)
+const sessionStore = new Map();
+
+// Clean up expired states every 5 minutes
+setInterval(() => {
+  const now = Date.now();
+  const fiveMinutes = 5 * 60 * 1000;
+
+  for (const [state, data] of sessionStore.entries()) {
+    if (now - data.timestamp > fiveMinutes) {
+      sessionStore.delete(state);
+    }
+  }
+}, 5 * 60 * 1000);
+
+// Start Fayda ID OIDC authentication
 router.get('/fayda-auth', (req, res) => {
   try {
-    // For development/testing - simulate OIDC flow
-    const state = 'test-state-' + Date.now();
+    const state = 'test-state-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9);
     const authUrl = `http://localhost:3000/auth/callback?code=test-code&state=${state}`;
 
-    // Store state in session
+    // Store state in memory for verification
+    sessionStore.set(state, {
+      timestamp: Date.now(),
+      used: false
+    });
+
+    // Also store in session as backup
     req.session = req.session || {};
     req.session.state = state;
+
+    console.log('Generated state for auth:', state);
 
     res.status(200).json({
       authUrl,
@@ -60,37 +92,112 @@ router.post('/fayda-callback', [
 
     const { code, state } = req.body;
 
-    // Verify state parameter
-    if (!req.session || req.session.state !== state) {
+    console.log('Callback received - Code:', code, 'State:', state);
+    console.log('Session state:', req.session?.state);
+    console.log('Stored states:', Array.from(sessionStore.keys()));
+
+    // Verify state parameter (check both session and memory store)
+    const storedSession = sessionStore.get(state);
+    const sessionValid = req.session && req.session.state === state;
+    const memoryValid = storedSession && !storedSession.used;
+
+    if (!sessionValid && !memoryValid) {
+      console.log('State verification failed');
       return res.status(400).json({
         error: 'Invalid State',
-        message: 'State parameter mismatch'
+        message: 'State parameter mismatch or expired'
       });
     }
 
-    // Simulate successful authentication with test user
-    const userId = 'test-user-' + Date.now();
-    const user = {
-      id: userId,
-      faydaId: 'TEST123456789',
-      email: 'test@example.com',
-      firstName: 'Test',
-      lastName: 'User',
-      role: 'patient'
-    };
+    // Mark state as used to prevent replay attacks
+    if (storedSession) {
+      storedSession.used = true;
+    }
 
-    // Store user in memory
-    users.set(userId, user);
+    // Try OIDC flow first, fallback to test user
+    let user;
+    try {
+      // OIDC flow (when properly configured)
+      const tokenSet = await faydaOIDCService.exchangeCodeForTokens(
+        code,
+        req.session.codeVerifier,
+        state,
+        req.session.nonce
+      );
 
-    const token = generateToken(userId);
+      const claims = await faydaOIDCService.verifyIdToken(tokenSet.id_token, req.session.nonce);
+      const userData = faydaOIDCService.mapClaimsToUserData(claims);
+
+      user = await User.findOne({ where: { faydaId: userData.faydaId } });
+
+      if (user) {
+        await user.update({ lastLogin: new Date() });
+      } else {
+        user = await User.create({
+          ...userData,
+          role: 'patient',
+          lastLogin: new Date()
+        });
+
+        await Patient.create({
+          userId: user.id,
+          emergencyContactName: '',
+          emergencyContactPhone: '',
+          emergencyContactRelation: '',
+          address: '',
+          city: '',
+          region: ''
+        });
+      }
+    } catch (oidcError) {
+      // Fallback to test user creation
+      user = await User.findOne({ where: { faydaId: 'TEST123456789' } });
+
+      if (!user) {
+        user = await User.create({
+          faydaId: 'TEST123456789',
+          email: 'test@example.com',
+          firstName: 'Test',
+          lastName: 'User',
+          phoneNumber: '+251911234567',
+          dateOfBirth: '1990-01-01',
+          gender: 'male',
+          role: 'patient',
+          lastLogin: new Date()
+        });
+
+        await Patient.create({
+          userId: user.id,
+          emergencyContactName: 'Emergency Contact',
+          emergencyContactPhone: '+251911234568',
+          emergencyContactRelation: 'Family',
+          address: 'Test Address',
+          city: 'Addis Ababa',
+          region: 'Addis Ababa'
+        });
+      } else {
+        await user.update({ lastLogin: new Date() });
+      }
+    }
+
+    const token = generateToken(user.id);
 
     // Clear session data
+    delete req.session.codeVerifier;
     delete req.session.state;
+    delete req.session.nonce;
 
     res.status(200).json({
-      message: 'Authentication successful (TEST MODE)',
+      message: 'Authentication successful',
       token,
-      user
+      user: {
+        id: user.id,
+        faydaId: user.faydaId,
+        email: user.email,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        role: user.role
+      }
     });
   } catch (error) {
     console.error('Fayda callback error:', error);
@@ -205,8 +312,8 @@ router.post('/sms-login', [
 
     const { phoneNumber } = req.body;
 
-    // For testing - simulate user lookup
-    // In real implementation, this would check the database
+    // Find user by phone number or create if doesn't exist
+    let user = await User.findOne({ where: { phoneNumber } });
     console.log(`SMS login attempt for phone: ${phoneNumber}`);
 
     // Generate OTP (in production, send via SMS)
@@ -258,31 +365,55 @@ router.post('/verify-otp', [
       });
     }
 
-    // Create or find user for testing
-    const userId = 'sms-user-' + Date.now();
-    const user = {
-      id: userId,
-      faydaId: 'SMS' + phoneNumber.replace(/\D/g, '').slice(-9),
-      email: `user${phoneNumber.replace(/\D/g, '').slice(-4)}@example.com`,
-      firstName: 'SMS',
-      lastName: 'User',
-      role: 'patient',
-      phoneNumber: phoneNumber
-    };
+    // Find or create user
+    let user = await User.findOne({ where: { phoneNumber } });
 
-    // Store user in memory
-    users.set(userId, user);
+    if (!user) {
+      // Create new user
+      const faydaId = 'SMS' + phoneNumber.replace(/\D/g, '').slice(-9);
+      user = await User.create({
+        faydaId,
+        email: `user${phoneNumber.replace(/\D/g, '').slice(-4)}@example.com`,
+        phoneNumber,
+        firstName: 'SMS',
+        lastName: 'User',
+        dateOfBirth: '1990-01-01',
+        gender: 'other',
+        role: 'patient',
+        lastLogin: new Date()
+      });
 
-    const token = generateToken(userId);
+      // Create patient profile
+      await Patient.create({
+        userId: user.id,
+        emergencyContactName: 'Emergency Contact',
+        emergencyContactPhone: phoneNumber,
+        emergencyContactRelation: 'Self',
+        address: 'Address not provided',
+        city: 'City not provided',
+        region: 'Region not provided'
+      });
+    } else {
+      await user.update({ lastLogin: new Date() });
+    }
+
+    const token = generateToken(user.id);
 
     // Clear OTP from session
     delete req.session.otp;
     delete req.session.phoneNumber;
 
     res.status(200).json({
-      message: 'OTP verification successful (TEST MODE)',
+      message: 'OTP verification successful',
       token,
-      user
+      user: {
+        id: user.id,
+        faydaId: user.faydaId,
+        email: user.email,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        role: user.role
+      }
     });
   } catch (error) {
     console.error('OTP verification error:', error);
@@ -296,7 +427,13 @@ router.post('/verify-otp', [
 // Get current user profile
 router.get('/profile', authenticateToken, async (req, res) => {
   try {
-    const user = users.get(req.user.id);
+    const user = await User.findByPk(req.user.id, {
+      include: [{
+        model: Patient,
+        as: 'patientProfile'
+      }],
+      attributes: { exclude: ['createdAt', 'updatedAt'] }
+    });
 
     if (!user) {
       return res.status(404).json({

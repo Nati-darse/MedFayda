@@ -14,7 +14,18 @@ const User = sequelize.define('User', {
     allowNull: false,
     validate: {
       notEmpty: true
-    }
+    },
+    comment: 'Fayda ID - Primary authentication identifier'
+  },
+  fin: {
+    type: DataTypes.STRING,
+    allowNull: false,
+    unique: true,
+    validate: {
+      notEmpty: true,
+      len: [10, 15] // FIN length validation
+    },
+    comment: 'Fayda ID Number (FIN) - Used by doctors for patient lookup'
   },
   email: {
     type: DataTypes.STRING,
@@ -58,9 +69,25 @@ const User = sequelize.define('User', {
     allowNull: false
   },
   role: {
-    type: DataTypes.ENUM('patient', 'doctor', 'nurse', 'admin', 'receptionist'),
+    type: DataTypes.ENUM('patient', 'doctor', 'lab_technician', 'nurse', 'admin', 'receptionist'),
     defaultValue: 'patient',
-    allowNull: false
+    allowNull: false,
+    comment: 'User role for RBAC - supports centralized access control'
+  },
+  healthCenterId: {
+    type: DataTypes.STRING,
+    allowNull: true,
+    comment: 'Health center ID where medical professional works'
+  },
+  licenseNumber: {
+    type: DataTypes.STRING,
+    allowNull: true,
+    comment: 'Professional license number for doctors and lab technicians'
+  },
+  specialization: {
+    type: DataTypes.STRING,
+    allowNull: true,
+    comment: 'Medical specialization for doctors'
   },
   isActive: {
     type: DataTypes.BOOLEAN,
