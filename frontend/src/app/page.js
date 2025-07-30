@@ -1,6 +1,6 @@
 'use client';
 
-import { FaHeartbeat, FaUserMd, FaCalendarAlt, FaShieldAlt, FaStar, FaUsers, FaLock } from 'react-icons/fa';
+import { FaHeartbeat, FaUserMd, FaCalendarAlt, FaShieldAlt, FaStar, FaUsers, FaLock, FaUser } from 'react-icons/fa';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 
@@ -89,21 +89,52 @@ const handleFaydaLogin = async () => {
             </div>
 
             {/* CTA Buttons */}
-            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-              <button
-                className="group relative px-8 py-4 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-xl font-semibold text-lg shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300 flex items-center space-x-2"
-                onClick={handleFaydaLogin}
-              >
-                <FaShieldAlt className="w-5 h-5" />
-                <span>Login with Fayda ID</span>
-                <div className="absolute inset-0 bg-gradient-to-r from-blue-700 to-blue-800 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-              </button>
-              <button
-                className="px-8 py-4 border-2 border-blue-600 text-blue-600 rounded-xl font-semibold text-lg hover:bg-blue-50 transition-all duration-300 flex items-center space-x-2"
-                onClick={() => router.push('/auth/sms-login')}
-              >
-                <span>SMS Login</span>
-              </button>
+            <div className="space-y-6">
+              <div className="text-center">
+                <h3 className="text-xl font-semibold text-gray-800 mb-4">Choose Your Portal</h3>
+              </div>
+
+              {/* Patient Portal */}
+              <div className="bg-white rounded-xl p-6 shadow-lg border border-gray-100">
+                <div className="text-center mb-4">
+                  <FaUser className="w-12 h-12 text-blue-500 mx-auto mb-2" />
+                  <h4 className="text-lg font-semibold text-gray-800">Patient Portal</h4>
+                  <p className="text-sm text-gray-600">Access your health records and appointments</p>
+                </div>
+                <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                  <button
+                    className="group relative px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg font-semibold shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300 flex items-center justify-center space-x-2"
+                    onClick={handleFaydaLogin}
+                  >
+                    <FaShieldAlt className="w-4 h-4" />
+                    <span>Fayda ID Login</span>
+                  </button>
+                  <button
+                    className="px-6 py-3 border-2 border-blue-600 text-blue-600 rounded-lg font-semibold hover:bg-blue-50 transition-all duration-300 flex items-center justify-center space-x-2"
+                    onClick={() => router.push('/auth/sms-login')}
+                  >
+                    <span>SMS Login</span>
+                  </button>
+                </div>
+              </div>
+
+              {/* Doctor Portal */}
+              <div className="bg-white rounded-xl p-6 shadow-lg border border-gray-100">
+                <div className="text-center mb-4">
+                  <FaUserMd className="w-12 h-12 text-green-500 mx-auto mb-2" />
+                  <h4 className="text-lg font-semibold text-gray-800">Doctor Portal</h4>
+                  <p className="text-sm text-gray-600">Access centralized patient records</p>
+                </div>
+                <div className="flex justify-center">
+                  <button
+                    className="px-6 py-3 bg-gradient-to-r from-green-600 to-green-700 text-white rounded-lg font-semibold shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300 flex items-center space-x-2"
+                    onClick={() => router.push('/doctor/login')}
+                  >
+                    <FaUserMd className="w-4 h-4" />
+                    <span>Doctor Login</span>
+                  </button>
+                </div>
+              </div>
             </div>
 
             {/* Display Login Error */}
