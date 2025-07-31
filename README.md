@@ -1,4 +1,4 @@
-# 🏥 MedFayda - Centralized Health Records System
+# 🏥 MedFayda - Centralized Health Records System (Hackaton project )
 
 > **Empowering Ethiopia's healthcare system with secure, accessible medical records**
 
@@ -164,9 +164,14 @@ cd frontend && npm run build
 
 ## 👥 Contributors
 - **Natnael Darsema**
-- **Kidus Paulos**
+- **Kidus Paulos**  
 - **Foziya Fetudin**
 
+## Email address
+```
+natnaeldarsema@gmail.com
+pauloskidus48@gmail.com
+```
 ## 📄 License
 
 MIT License - Built with ❤️ for Ethiopia's healthcare future 🇪🇹
