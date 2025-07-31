@@ -115,10 +115,16 @@ router.post('/fayda/callback', [
 
     if (!sessionValid && !memoryValid) {
       console.log('State verification failed');
-      return res.status(400).json({
-        error: 'Invalid State',
-        message: 'State parameter mismatch or expired'
-      });
+
+      // In development/mock mode, be more lenient with state validation
+      if (!useDatabase && process.env.NODE_ENV !== 'production') {
+        console.log('Development mode: Allowing state validation bypass');
+      } else {
+        return res.status(400).json({
+          error: 'Invalid State',
+          message: 'State parameter mismatch or expired'
+        });
+      }
     }
 
     if (storedSession) {
@@ -126,66 +132,57 @@ router.post('/fayda/callback', [
     }
 
     let user;
-    try {
-      const tokenSet = await faydaOIDCService.exchangeCodeForTokens(
-        code,
-        req.session.codeVerifier,
-        state,
-        req.session.nonce
-      );
 
-      const claims = await faydaOIDCService.verifyIdToken(tokenSet.id_token, req.session.nonce);
-      const userData = faydaOIDCService.mapClaimsToUserData(claims);
+    if (useDatabase && faydaOIDCService) {
+      // Production mode with real OIDC
+      try {
+        const tokenSet = await faydaOIDCService.exchangeCodeForTokens(
+          code,
+          req.session.codeVerifier,
+          state,
+          req.session.nonce
+        );
 
-      user = await User.findOne({ where: { faydaId: userData.faydaId } });
+        const claims = await faydaOIDCService.verifyIdToken(tokenSet.id_token, req.session.nonce);
+        const userData = faydaOIDCService.mapClaimsToUserData(claims);
 
-      if (user) {
-        await user.update({ lastLogin: new Date() });
-      } else {
-        user = await User.create({
-          ...userData,
-          role: 'patient',
-          lastLogin: new Date()
-        });
+        user = await User.findOne({ where: { faydaId: userData.faydaId } });
 
-        await Patient.create({
-          userId: user.id,
-          emergencyContactName: '',
-          emergencyContactPhone: '',
-          emergencyContactRelation: '',
-          address: '',
-          city: '',
-          region: ''
+        if (user) {
+          await user.update({ lastLogin: new Date() });
+        } else {
+          user = await User.create({
+            ...userData,
+            role: 'patient',
+            lastLogin: new Date()
+          });
+        }
+      } catch (oidcError) {
+        console.error('OIDC Error:', oidcError);
+        return res.status(500).json({
+          error: 'Authentication Failed',
+          message: 'Unable to complete Fayda ID authentication'
         });
       }
-    } catch (oidcError) {
-      user = await User.findOne({ where: { faydaId: 'TEST123456789' } });
+    } else {
+      // Mock mode for development
+      console.log('Using mock authentication for development');
 
-      if (!user) {
-        user = await User.create({
-          faydaId: 'TEST123456789',
-          email: 'test@example.com',
-          firstName: 'Test',
-          lastName: 'User',
-          phoneNumber: '+251911234567',
-          dateOfBirth: '1990-01-01',
-          gender: 'male',
-          role: 'patient',
-          lastLogin: new Date()
-        });
+      // Create mock user data
+      const mockUserData = {
+        id: 'mock-user-' + Date.now(),
+        faydaId: 'FIN' + Date.now(),
+        fin: 'FIN' + Date.now(),
+        firstName: 'Mock',
+        lastName: 'User',
+        email: 'mock@medfayda.et',
+        phoneNumber: '+251911234567',
+        role: 'patient',
+        lastLogin: new Date()
+      };
 
-        await Patient.create({
-          userId: user.id,
-          emergencyContactName: 'Emergency Contact',
-          emergencyContactPhone: '+251911234568',
-          emergencyContactRelation: 'Family',
-          address: 'Test Address',
-          city: 'Addis Ababa',
-          region: 'Addis Ababa'
-        });
-      } else {
-        await user.update({ lastLogin: new Date() });
-      }
+      user = mockUserData;
+      memoryUsers.set(user.id, user);
     }
 
     let token;

@@ -66,7 +66,7 @@ app.get('/health', (req, res) => {
 });
 
 // Authentication routes
-app.use('/api/auth', require('./routes/betterAuth'));
+app.use('/api/auth', require('./routes/auth'));
 
 // Only enable database-dependent routes if database is available
 if (useDatabase) {
