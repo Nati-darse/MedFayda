@@ -164,9 +164,14 @@ cd frontend && npm run build
 
 ## 👥 Contributors
 - **Natnael Darsema**
-- **Kidus Paulos**
+- **Kidus Paulos**  
 - **Foziya Fetudin**
 
+## Email address
+```
+natnaeldarsema@gmail.com
+pauloskidus48@gmail.com
+```
 ## 📄 License
 
 MIT License - Built with ❤️ for Ethiopia's healthcare future 🇪🇹
