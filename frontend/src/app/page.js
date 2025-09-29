@@ -177,8 +177,7 @@ const handleFaydaLogin = async () => {
                 </div>
                 <h4 className="text-xl font-bold text-gray-800">Government-Grade Security</h4>
                 <p className="text-gray-600 leading-relaxed">
-                  Your medical data is protected by Ethiopia's official Fayda ID system, 
-                  ensuring maximum security and privacy compliance.
+                  {"Your medical data is protected by Ethiopia's official Fayda ID system,ensuring maximum security and privacy compliance."}
                 </p>
               </div>
             </div>
@@ -231,8 +230,7 @@ const handleFaydaLogin = async () => {
               </h3>
             </div>
             <p className="text-lg text-gray-600 max-w-3xl mx-auto">
-              Built in partnership with Ethiopia's Ministry of Health and leading healthcare 
-              institutions to ensure the highest standards of care and data protection.
+              {"Built in partnership with Ethiopia's Ministry of Health and leading healthcare institutions to ensure the highest standards of care and data protection."}
             </p>
             <div className="bg-white rounded-2xl p-8 shadow-lg max-w-2xl mx-auto">
               <div className="flex items-center justify-center space-x-4 mb-4">
@@ -261,10 +259,10 @@ const handleFaydaLogin = async () => {
             <span className="text-2xl font-bold">MedFayda</span>
           </div>
           <p className="text-gray-400 mb-4">
-            Empowering Ethiopia's healthcare system with secure, accessible medical records
+           {" Empowering Ethiopia's healthcare system with secure, accessible medical records"}
           </p>
           <div className="text-sm text-gray-500">
-            © 2024 MedFayda. Built with ❤️ for Ethiopia's healthcare future.
+           {" © 2024 MedFayda. Built with ❤️ for Ethiopia's healthcare future."}
           </div>
         </div>
       </footer>

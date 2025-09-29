@@ -149,8 +149,7 @@ export default function LoginPage() {
                   🛡️ Government-Grade Security
                 </h3>
                 <p className="text-sm text-gray-600 leading-relaxed">
-                  Your login is protected by Ethiopia's official Fayda ID system. 
-                  We never store your credentials and all data is encrypted end-to-end.
+                  {"Your login is protected by Ethiopia's official Fayda ID system. We never store your credentials and all data is encrypted end-to-end."}
                 </p>
               </div>
             </div>

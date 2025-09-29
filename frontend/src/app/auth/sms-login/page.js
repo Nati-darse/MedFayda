@@ -239,7 +239,7 @@ export default function SMSLoginPage() {
                       onClick={handleResendOTP}
                       disabled={isLoading}
                     >
-                      Didn't receive the code? Resend
+                      {"Didn't receive the code? Resend"}
                     </button>
                   </div>
                 </div>

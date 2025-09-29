@@ -15,6 +15,7 @@ import {
   FaHeartbeat,
   FaPills,
   FaFlask,
+  FaTimes,
   FaStethoscope
 } from 'react-icons/fa';
 

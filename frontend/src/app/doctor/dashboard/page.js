@@ -230,7 +230,7 @@ export default function DoctorDashboard() {
           <div className="bg-white rounded-xl shadow-lg border border-gray-100 p-6">
             <h3 className="text-lg font-bold text-gray-800 mb-4 flex items-center">
               <FaChartLine className="w-5 h-5 mr-2 text-blue-500" />
-              Today's Overview
+              {"Today's Overview"}
             </h3>
             <div className="space-y-4">
               <div className="flex items-center justify-between p-3 bg-blue-50 rounded-lg">
