@@ -164,8 +164,7 @@ cd frontend && npm run build
 
 ## 👥 Contributors
 - **Natnael Darsema**
-- **Kidus Paulos**  
-- **Foziya Fetudin**
+- **Kidus Paulos** 
 
 ## Email address
 ```
